@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vf:VymennyFormat xmlns:gml="http://www.opengis.net/gml/3.2"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:ami="urn:cz:isvs:ruian:schemas:AdrMistoIntTypy:v1"
+                  xmlns:base="urn:cz:isvs:ruian:schemas:BaseTypy:v1"
+                  xmlns:coi="urn:cz:isvs:ruian:schemas:CastObceIntTypy:v1"
+                  xmlns:com="urn:cz:isvs:ruian:schemas:CommonTypy:v1"
+                  xmlns:kui="urn:cz:isvs:ruian:schemas:KatUzIntTypy:v1"
+                  xmlns:kri="urn:cz:isvs:ruian:schemas:KrajIntTypy:v1"
+                  xmlns:mci="urn:cz:isvs:ruian:schemas:MomcIntTypy:v1"
+                  xmlns:mpi="urn:cz:isvs:ruian:schemas:MopIntTypy:v1"
+                  xmlns:obi="urn:cz:isvs:ruian:schemas:ObecIntTypy:v1"
+                  xmlns:oki="urn:cz:isvs:ruian:schemas:OkresIntTypy:v1"
+                  xmlns:opi="urn:cz:isvs:ruian:schemas:OrpIntTypy:v1"
+                  xmlns:pai="urn:cz:isvs:ruian:schemas:ParcelaIntTypy:v1"
+                  xmlns:pui="urn:cz:isvs:ruian:schemas:PouIntTypy:v1"
+                  xmlns:rsi="urn:cz:isvs:ruian:schemas:RegSouIntiTypy:v1"
+                  xmlns:spi="urn:cz:isvs:ruian:schemas:SpravObvIntTypy:v1"
+                  xmlns:sti="urn:cz:isvs:ruian:schemas:StatIntTypy:v1"
+                  xmlns:soi="urn:cz:isvs:ruian:schemas:StavObjIntTypy:v1"
+                  xmlns:uli="urn:cz:isvs:ruian:schemas:UliceIntTypy:v1"
+                  xmlns:vci="urn:cz:isvs:ruian:schemas:VuscIntTypy:v1"
+                  xmlns:vf="urn:cz:isvs:ruian:schemas:VymennyFormatTypy:v1"
+                  xmlns:zji="urn:cz:isvs:ruian:schemas:ZsjIntTypy:v1"
+                  xmlns:voi="urn:cz:isvs:ruian:schemas:VOIntTypy:v1"
+                  xsi:schemaLocation="urn:cz:isvs:ruian:schemas:VymennyFormatTypy:v1 ../ruian/xsd/vymenny_format/VymennyFormatTypy.xsd">
+    <vf:Data>
+        <vf:AdresniMista>
+            <vf:AdresniMisto gml:id="AD.21690278">
+                <ami:Kod>21690278</ami:Kod>
+                <ami:CisloDomovni>1</ami:CisloDomovni>
+                <ami:Psc>11900</ami:Psc>
+                <ami:StavebniObjekt>
+                    <soi:Kod>21666644</soi:Kod>
+                </ami:StavebniObjekt>
+                <ami:Ulice>
+                    <uli:Kod>482536</uli:Kod>
+                </ami:Ulice>
+                <ami:VOKod>30531</ami:VOKod>
+                <ami:PlatiOd>2017-06-07T00:00:00</ami:PlatiOd>
+                <ami:IdTransakce>1884547</ami:IdTransakce>
+                <ami:GlobalniIdNavrhuZmeny>1392916</ami:GlobalniIdNavrhuZmeny>
+                <ami:Geometrie>
+                    <ami:DefinicniBod>
+                        <ami:AdresniBod>
+                            <gml:Point gml:id="DAM.21690278.1"
+                                       srsName="urn:ogc:def:crs:EPSG::5514"
+                                       srsDimension="2">
+                                <gml:pos>-744384.54 -1042569.73</gml:pos>
+                            </gml:Point>
+                        </ami:AdresniBod>
+                    </ami:DefinicniBod>
+                </ami:Geometrie>
+            </vf:AdresniMisto>
+        </vf:AdresniMista>
+        <vf:Obce>
+            <vf:Obec gml:id="OB.554782">
+                <obi:Kod>554782</obi:Kod>
+                <obi:Nazev>Praha</obi:Nazev>
+                <obi:StatusKod>5</obi:StatusKod>
+                <obi:Okres>
+                    <oki:Kod>3100</oki:Kod>
+                </obi:Okres>
+                <obi:Pou>
+                    <pui:Kod>19</pui:Kod>
+                </obi:Pou>
+                <obi:PlatiOd>2017-12-06T00:00:00</obi:PlatiOd>
+                <obi:IdTransakce>2181367</obi:IdTransakce>
+                <obi:GlobalniIdNavrhuZmeny>1602521</obi:GlobalniIdNavrhuZmeny>
+                <obi:MluvnickeCharakteristiky>
+                    <com:Pad2>Prahy</com:Pad2>
+                    <com:Pad3>Praze</com:Pad3>
+                    <com:Pad4>Prahu</com:Pad4>
+                    <com:Pad6>Praze</com:Pad6>
+                    <com:Pad7>Prahou</com:Pad7>
+                </obi:MluvnickeCharakteristiky>
+                <obi:VlajkaText>List tvoří dva vodorovné pruhy, žlutý a červený. Poměr šířky k délce listu je 2 : 3.
+                </obi:VlajkaText>
+                <obi:CleneniSMRozsahKod>2</obi:CleneniSMRozsahKod>
+                <obi:CleneniSMTypKod>1</obi:CleneniSMTypKod>
+                <obi:NutsLau>CZ0100554782</obi:NutsLau>
+                <obi:Geometrie>
+                    <obi:DefinicniBod>
+                        <gml:MultiPoint gml:id="DOB.554782"
+                                        srsName="urn:ogc:def:crs:EPSG::5514"
+                                        srsDimension="2">
+                            <gml:pointMembers>
+                                <gml:Point gml:id="DOB.554782.1">
+                                    <gml:pos>-743100.00 -1043300.00</gml:pos>
+                                </gml:Point>
+                            </gml:pointMembers>
+                        </gml:MultiPoint>
+                    </obi:DefinicniBod>
+                </obi:Geometrie>
+                <obi:DatumVzniku>1869-01-01T00:00:00</obi:DatumVzniku>
+            </vf:Obec>
+        </vf:Obce>
+        <vf:Ulice>
+            <vf:Ulice gml:id="UL.782335">
+                <uli:Kod>782335</uli:Kod>
+                <uli:Nazev>1. máje</uli:Nazev>
+                <uli:Obec>
+                    <obi:Kod>538728</obi:Kod>
+                </uli:Obec>
+                <uli:PlatiOd>2020-08-12T00:00:00</uli:PlatiOd>
+                <uli:IdTransakce>3465717</uli:IdTransakce>
+                <uli:GlobalniIdNavrhuZmeny>2311184</uli:GlobalniIdNavrhuZmeny>
+            </vf:Ulice>
+        </vf:Ulice>
+    </vf:Data>
+</vf:VymennyFormat>
