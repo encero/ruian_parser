@@ -44,18 +44,20 @@ type RuianAPI struct {
 const (
 	userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
 
-	fullDataLinkListUrl                = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=U&vf.up=OB&vf.ds=K&_vf.vu=on&_vf.vu=on&_vf.vu=on&_vf.vu=on&vf.uo=A&search=Vyhledat"
-	incrementalDataLinkListUrlTemplate = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=Z&vf.pd={_date_}&vf.ds=K&_vf.vu=on&_vf.vu=on&vf.vu=H&_vf.vu=on&_vf.vu=on&search=Vyhledat"
+	fullDataLinkListURL                = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=U&vf.up=OB&vf.ds=K&_vf.vu=on&_vf.vu=on&_vf.vu=on&_vf.vu=on&vf.uo=A&search=Vyhledat"
+	incrementalDataLinkListURLTemplate = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=Z&vf.pd={_date_}&vf.ds=K&_vf.vu=on&_vf.vu=on&vf.vu=H&_vf.vu=on&_vf.vu=on&search=Vyhledat"
 
 	defaultFullResultLinkCount = 20_000
 )
 
 func (api RuianAPI) FullDataLinkList(ctx context.Context) ([]string, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", fullDataLinkListUrl, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", fullDataLinkListURL, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header.Set("User-Agent", userAgent)
+
 	resp, err := api.Doer.Do(req)
 	if err != nil {
 		return nil, err
@@ -69,13 +71,15 @@ func (api RuianAPI) FullDataLinkList(ctx context.Context) ([]string, error) {
 }
 
 func (api RuianAPI) IncrementalDataLinkList(ctx context.Context, fromDate time.Time) ([]string, error) {
-	url := strings.Replace(incrementalDataLinkListUrlTemplate, "{_date_}", fromDate.Format("02.01.2006"), 1)
+	url := strings.Replace(incrementalDataLinkListURLTemplate, "{_date_}", fromDate.Format("02.01.2006"), 1)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header.Set("User-Agent", userAgent)
+
 	resp, err := api.Doer.Do(req)
 	if err != nil {
 		return nil, err
@@ -111,10 +115,12 @@ func ParseFileName(filename string) (RuianFileDescriptor, error) {
 	var index = 0
 
 	var err error
+
 	desc.Date, err = time.Parse("20060102", parts[index])
 	if err != nil {
 		return RuianFileDescriptor{}, fmt.Errorf("invalid ruian filename date: %s", filename)
 	}
+
 	index++
 
 	switch parts[index] {
@@ -125,6 +131,7 @@ func ParseFileName(filename string) (RuianFileDescriptor, error) {
 	default:
 		return RuianFileDescriptor{}, fmt.Errorf("invalid ruian filename extent: %s", filename)
 	}
+
 	index++
 
 	if len(parts) == 4 {
@@ -169,7 +176,6 @@ func FilterNewestFromList(input []string) ([]string, error) {
 		} else if newest[desc.CityCode].Date.Before(desc.Date) {
 			newest[desc.CityCode] = desc
 		}
-
 	}
 
 	output := make([]string, 0, len(newest))

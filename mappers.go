@@ -12,6 +12,7 @@ func GetOrCreateAddressPlace(ctx context.Context, etnc *ent.Client, ID int32) (*
 	if err != nil && !ent.IsNotFound(err) {
 		return nil, fmt.Errorf("loading addressPlace: %w", err)
 	}
+
 	if ent.IsNotFound(err) {
 		apc := etnc.AddressPlace.Create()
 		apc.SetID(ID)
@@ -22,6 +23,7 @@ func GetOrCreateAddressPlace(ctx context.Context, etnc *ent.Client, ID int32) (*
 		if err != nil {
 			return nil, fmt.Errorf("addressPlace Create:%w", err)
 		}
+
 		return ap, nil
 	}
 
@@ -33,6 +35,7 @@ func GetOrCreateStreet(ctx context.Context, entc *ent.Client, ID int32) (*ent.St
     if err != nil && !ent.IsNotFound(err) {
         return nil, fmt.Errorf("loading street: %w", err)
     }
+
     if ent.IsNotFound(err) {
         sc := entc.Street.Create()
         sc.SetID(ID)
@@ -42,6 +45,7 @@ func GetOrCreateStreet(ctx context.Context, entc *ent.Client, ID int32) (*ent.St
         if err != nil {
             return nil, fmt.Errorf("street create: %w", err)
         }
+
         return s, nil
     }
 
@@ -55,12 +59,14 @@ func UpdateAddressPlace(ap *ent.AddressPlace, source AddressPlace) (*ent.Address
 	if err != nil {
 		return nil, fmt.Errorf("addressPlace number not int, %w", err)
 	}
+
 	apu.SetNumber(int32(number))
 
 	zip, err := strconv.ParseInt(source.Zip, 10, 32)
 	if err != nil {
 		return nil, fmt.Errorf("ZIP not int, %w", err)
 	}
+
 	apu.SetZip(int32(zip))
 
 	if source.OrientationNumber != "" {
@@ -68,6 +74,7 @@ func UpdateAddressPlace(ap *ent.AddressPlace, source AddressPlace) (*ent.Address
 		if err != nil {
 			return nil, fmt.Errorf("orientation number not int, %w", err)
 		}
+
 		apu.SetOrientationNumber(int32(orientation))
 	}
 
@@ -94,8 +101,8 @@ func MapCity(c *ent.Client, source City) (*ent.CityCreate, error) {
 	if err != nil {
 		return nil, fmt.Errorf("city code not int, %w", err)
 	}
-	city.SetID(int32(code))
 
+	city.SetID(int32(code))
 	city.SetName(source.Name)
 
 	return city, nil

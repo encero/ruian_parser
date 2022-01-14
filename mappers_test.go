@@ -49,7 +49,7 @@ func TestGetOrCreateAddressPlace(t *testing.T) {
     is.Equal(ap.Number, int32(12))
 
     ap, err = GetOrCreateAddressPlace(testCtx(), ec, 2)
-    is.NoErr(err) // should create new adress place without error
+    is.NoErr(err) // should create new address place without error
 
     is.Equal(ap.ID, int32(2))
 }
@@ -64,7 +64,7 @@ func TestUpdateAddressPlace(t *testing.T) {
 	is.NoErr(err)
 
     ap, err := GetOrCreateAddressPlace(testCtx(), ec, 1)
-    is.NoErr(err) // prepare adress place for update
+    is.NoErr(err) // prepare address place for update
 
 	aps := AddressPlace{
 		Code:              "1",

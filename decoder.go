@@ -64,12 +64,14 @@ func (d *Decoder) Next() (interface{}, error) {
 			if comparePath(d.path, []string{xmlExchangeFormat, xmlData, xmlCities, xmlCity}) {
 				c := City{}
 				err = d.decodeOne(&c, &element)
+
 				return c, err
 			}
 
 			if comparePath(d.path, []string{xmlExchangeFormat, xmlData, xmlStreet, xmlStreet}) {
 				c := Street{}
 				err = d.decodeOne(&c, &element)
+
 				return c, err
 			}
 		}

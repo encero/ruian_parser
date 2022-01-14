@@ -22,7 +22,7 @@ func TestFetchFullLoadList(t *testing.T) {
 	api := RuianAPI{
 		Doer: httpDoer(func(req *http.Request) (*http.Response, error) {
 			is.Equal(req.Method, "GET")
-			is.Equal(req.URL.String(), fullDataLinkListUrl)
+			is.Equal(req.URL.String(), fullDataLinkListURL)
 
 			return &http.Response{
 				StatusCode: 200,
@@ -34,7 +34,6 @@ func TestFetchFullLoadList(t *testing.T) {
 	is.NoErr(err)
 
 	is.Equal(list, []string{"1", "2"})
-
 }
 
 func TestIncrementalFullLoadList(t *testing.T) {
@@ -64,6 +63,7 @@ func TestParseFileName(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
+
 		return parsed
 	}
 

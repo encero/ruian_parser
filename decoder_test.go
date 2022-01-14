@@ -42,6 +42,7 @@ func TestDecoder(t *testing.T) {
 
 	f, err := os.Open("testdata/sample.xml")
 	is.NoErr(err) // os.Open should always succeed
+
 	defer f.Close()
 
 	decoder := &Decoder{

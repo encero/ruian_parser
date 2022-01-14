@@ -34,11 +34,13 @@ func main() {
 	}
 
 	log.Println("loading full data link list")
+
 	list, err := api.FullDataLinkList(context.Background())
 	if err != nil {
 		log.Printf("failed getting full data link list: %v", err)
 		return
 	}
+
 	log.Println("loaded")
 
 	list, err = FilterNewestFromList(list)
@@ -83,6 +85,7 @@ func main() {
 
         if since := time.Since(start).Seconds(); since > 5 {
             log.Printf("processed: %d %f,0/s", loaded, float64(lastCheckpoint)/since)
+
             start = time.Now()
             lastCheckpoint = 0
         }
