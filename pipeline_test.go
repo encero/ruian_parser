@@ -64,7 +64,12 @@ func TestDownloader(t *testing.T) {
 		}
 	}
 
-	channelClosed(is, ctx, downCh)
+	select {
+	case _, ok := <-downCh:
+		is.True(!ok) // channel should be closed
+	case <-ctx.Done():
+		is.Fail() // channel not closed in time
+	}
 }
 
 type TestCloserSpy struct {
@@ -168,7 +173,13 @@ func TestDecompressor(t *testing.T) {
 		is.Fail() // no file received on channel
 	}
 
-	channelClosed(is, ctx, out)
+	select {
+	case _, ok := <-out:
+		is.True(!ok) // channel should be closed
+	case <-ctx.Done():
+		is.Fail() // channel not closed in time
+	}
+
 	waitForChannel(is, ctx, wait)
 
 	select {
@@ -234,15 +245,6 @@ loop:
 	}
 
 	waitForChannel(is, ctx, wait)
-}
-
-func channelClosed[T any](is *is_.I, ctx context.Context, ch <-chan T) {
-	select {
-	case _, ok := <-ch:
-		is.True(!ok) // channel should be closed
-	case <-ctx.Done():
-		is.Fail() // channel not closed in time
-	}
 }
 
 func waitForChannel(is *is_.I, ctx context.Context, wait chan struct{}) {
