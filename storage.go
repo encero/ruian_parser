@@ -45,12 +45,12 @@ func StoreCity(ctx context.Context, entc *ent.Client, item interface{}) (bool, e
 
 	update, err := MapCity(entc, c)
 	if err != nil {
-		return true, fmt.Errorf("city mapping err: %v", err)
+		return true, fmt.Errorf("city mapping err: %w", err)
 	}
 
 	err = update.OnConflictColumns(city.FieldID).UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return true, fmt.Errorf("city save err: %v city: %+v", err, c)
+		return true, fmt.Errorf("city save err: %w city: %+v", err, c)
 	}
 
 	return true, nil
@@ -62,7 +62,7 @@ func StoreStreet(ctx context.Context, entc *ent.Client, item interface{}) (bool,
 		return false, nil
 	}
 
-    code, err := strconv.Atoi(s.Code)
+    code, err := strconv.ParseInt(s.Code, 10, 32)
     if err != nil {
         return true, fmt.Errorf("street code is not int")
     }
@@ -76,7 +76,7 @@ func StoreStreet(ctx context.Context, entc *ent.Client, item interface{}) (bool,
 
 	update, err := UpdateStreet(street, s)
 	if err != nil {
-		return true, fmt.Errorf("street mapping err: %v", err)
+		return true, fmt.Errorf("street mapping err: %w", err)
 	}
 
     _, err = update.Save(ctx)
@@ -93,15 +93,15 @@ func StoreAddressPlace(ctx context.Context, entc *ent.Client, item interface{}) 
 		return false, nil
 	}
 
-    code, err := strconv.Atoi(aps.Code)
+    code, err := strconv.ParseInt(aps.Code, 10, 32)
     if err != nil {
-        return true, fmt.Errorf("adress place code is not int")
+        return true, fmt.Errorf("address place code is not int")
     }
 
     // todo number parsing, move to elsewhere
     ap, err := GetOrCreateAddressPlace(ctx, entc, int32(code))
     if err != nil {
-        return true, fmt.Errorf("adress place not found or cant be created: %w", err)
+        return true, fmt.Errorf("address place not found or cant be created: %w", err)
     }
 
     apu, err := UpdateAddressPlace(ap, aps)
@@ -111,7 +111,7 @@ func StoreAddressPlace(ctx context.Context, entc *ent.Client, item interface{}) 
 
     _, err = apu.Save(ctx)
     if err != nil {
-        return true, fmt.Errorf("adress place save: %w", err)
+        return true, fmt.Errorf("address place save: %w", err)
     }
 
 	return true, nil

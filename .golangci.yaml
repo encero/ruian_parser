@@ -1,0 +1,27 @@
+linters:
+  enable:
+    - bodyclose
+    - durationcheck
+    - exhaustive
+    - errorlint
+    - dupl
+    - exportloopref
+    - gocognit
+    - gosec
+    - importas
+    - misspell
+    - nestif
+    - nilerr
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - unconvert
+    - wastedassign
+    - whitespace
+    - wsl
+run:
+  skip-dirs:

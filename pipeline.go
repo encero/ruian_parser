@@ -29,7 +29,7 @@ import (
 // - downloading, caching to disk, parsing and cleanup can be effectively merged to single component
 
 
-type HttpDoer interface {
+type HTTPDoer interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
@@ -58,11 +58,10 @@ type FileContent struct {
 
 type Downloader func(ctx context.Context) error
 
-func NewDownloader(doer HttpDoer, links []string) (<-chan DownloadedFile, Downloader) {
+func NewDownloader(doer HTTPDoer, links []string) (<-chan DownloadedFile, Downloader) {
 	ch := make(chan DownloadedFile, 1)
 
 	return ch, func(ctx context.Context) error {
-
 		for i, url := range links {
 			log.Printf("Downloading [%d/%d] %s", i, len(links), url)
 
@@ -76,12 +75,12 @@ func NewDownloader(doer HttpDoer, links []string) (<-chan DownloadedFile, Downlo
 
 		log.Println("Downloader finished")
 		close(ch)
+
 		return nil
 	}
 }
 
-func downloadFile(ctx context.Context, url string, doer HttpDoer) (DownloadedFile, error) {
-
+func downloadFile(ctx context.Context, url string, doer HTTPDoer) (DownloadedFile, error) {
 	file := DownloadedFile{}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -89,7 +88,7 @@ func downloadFile(ctx context.Context, url string, doer HttpDoer) (DownloadedFil
 		return file, fmt.Errorf("downloader: new request err: %w", err)
 	}
 
-	response, err := doer.Do(req)
+    response, err := doer.Do(req) //nolint: bodyclose // closed in different part of pipeline
 	if err != nil {
 		return file, fmt.Errorf("downloader: do request err: %w", err)
 	}
@@ -150,7 +149,6 @@ func cacheFile(input io.ReadCloser) (*os.File, error) {
 
 	outFile, err := ioutil.TempFile("", "ruian_*.zip")
 	if err != nil {
-
 		return nil, fmt.Errorf("file cacher: create temp file err: %w", err)
 	}
 
@@ -185,6 +183,7 @@ func NewDecompressor(in <-chan CachedFile) (<-chan FileContent, Decompressor) {
 				}
 
 				log.Println("Decompressing", inputFile.FileName)
+
 				stats, err := inputFile.Content.Stat()
 				if err != nil {
 					return fmt.Errorf("decompressor: input file stat err: %w", err)
@@ -201,14 +200,14 @@ func NewDecompressor(in <-chan CachedFile) (<-chan FileContent, Decompressor) {
 				}
 
 				if len(reader.File) != 1 {
-					return fmt.Errorf("decompressor: bad zip file, more than 1 embeded file")
+					return fmt.Errorf("decompressor: bad zip file, more than 1 embedded file")
 				}
 
 				file := reader.File[0]
 
 				contentReader, err := file.Open()
 				if err != nil {
-					return fmt.Errorf("decompressor: open embeded file: %w", err)
+					return fmt.Errorf("decompressor: open embedded file: %w", err)
 				}
 
 				ch <- FileContent{

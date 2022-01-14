@@ -25,13 +25,14 @@ func TestDownloader(t *testing.T) {
 		"https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_500011_UKSH.xml.zip",
 		"https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_500011_UKSH.xml.zip",
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), defaultWaitTime)
 	defer cancel()
 
 	called := 0
 	doer := httpDoer(func(req *http.Request) (*http.Response, error) {
 		is.Equal(req.URL.String(), links[0]) // check request URL
-		called += 1
+		called++
 
 		return &http.Response{
 			StatusCode: 200,
@@ -43,6 +44,7 @@ func TestDownloader(t *testing.T) {
 	})
 
 	downCh, downloader := NewDownloader(doer, links)
+
 	go func() {
 		err := downloader(ctx)
 		is.NoErr(err)
@@ -85,6 +87,7 @@ func (c *TestCloserSpy) Close() error {
 
 func TestNewFileCacher(t *testing.T) {
 	is := is_.New(t)
+
 	ctx, cancel := context.WithTimeout(context.Background(), defaultWaitTime)
 	defer cancel()
 
@@ -101,9 +104,11 @@ func TestNewFileCacher(t *testing.T) {
 		FileName:    "",
 		Content:     inFile,
 	}
+
 	close(in)
 
 	out, filecacher := NewFileCacher(in)
+
 	go func() {
 		err := filecacher(ctx)
 		is.NoErr(err)
@@ -131,11 +136,12 @@ func TestNewFileCacher(t *testing.T) {
 		is.Fail() // no file received on channel
 	}
 
-	waitForChannel(is, ctx, wait)
+	waitForChannel(ctx, is, wait)
 }
 
 func TestDecompressor(t *testing.T) {
 	is := is_.New(t)
+
 	ctx, cancel := context.WithTimeout(context.Background(), defaultWaitTime)
 	defer cancel()
 
@@ -147,12 +153,14 @@ func TestDecompressor(t *testing.T) {
 		ContentType: "application/zip",
 		Content:     readAtWrapper{File: testFile},
 	}
+
 	close(in)
 
 	wait := make(chan struct{})
 	defer close(wait)
 
 	out, decompressor := NewDecompressor(in)
+
 	go func() {
 		err := decompressor(ctx)
 		is.NoErr(err)
@@ -180,7 +188,7 @@ func TestDecompressor(t *testing.T) {
 		is.Fail() // channel not closed in time
 	}
 
-	waitForChannel(is, ctx, wait)
+	waitForChannel(ctx, is, wait)
 
 	select {
 	case _, ok := <-out:
@@ -195,6 +203,7 @@ var xmlSample []byte
 
 func TestMapper(t *testing.T) {
 	is := is_.New(t)
+
 	ctx, cancel := context.WithTimeout(context.Background(), defaultWaitTime)
 	defer cancel()
 
@@ -212,6 +221,7 @@ func TestMapper(t *testing.T) {
 	close(in)
 
 	out, mapper := NewMapper(in)
+
 	go func() {
 		err := mapper(ctx)
 		is.NoErr(err)
@@ -244,10 +254,10 @@ loop:
 		is.Equal(items[i], exp)
 	}
 
-	waitForChannel(is, ctx, wait)
+	waitForChannel( ctx,is, wait)
 }
 
-func waitForChannel(is *is_.I, ctx context.Context, wait chan struct{}) {
+func waitForChannel(ctx context.Context, is *is_.I, wait chan struct{}) {
 	select {
 	case <-wait:
 	case <-ctx.Done():
@@ -264,6 +274,7 @@ func (f readAtWrapper) ReadAt(p []byte, off int64) (n int, err error) {
 	if !ok {
 		return 0, fmt.Errorf("not seeker")
 	}
+
 	_, err = seeker.Seek(off, io.SeekStart)
 	if err != nil {
 		return 0, err

@@ -17,6 +17,7 @@ func TestStorageStore(t *testing.T) {
 	}
 
 	called := false
+
 	storage.AddHandler(func(_ context.Context, _ *ent.Client, item interface{}) (bool, error) {
 		called = true
 
@@ -42,7 +43,7 @@ func TestStorageStore_CallsAllHandlers(t *testing.T) {
 
 	callCount := 0
 	handler := func(_ context.Context, _ *ent.Client, item interface{}) (bool, error) {
-		callCount += 1
+		callCount ++
 
 		is.Equal(item, in) // should get same item
 
@@ -88,6 +89,7 @@ func TestStoreStreet(t *testing.T) {
 	storage.AddHandler(StoreStreet)
 
 	entc.City.Create().SetID(11).SetName("").SaveX(testCtx())
+
 	in := Street{
 		Code: "1234",
 		Name: "Test Street",
@@ -116,6 +118,7 @@ func TestStoreAddressPlace(t *testing.T) {
 	storage.AddHandler(StoreAddressPlace)
 
 	entc.Street.Create().SetID(12).SetName("").SaveX(testCtx())
+
 	in := AddressPlace{
 		Code:              "1",
 		Number:            "2",
