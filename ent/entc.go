@@ -1,11 +1,13 @@
+//go:build ignore
 // +build ignore
 
 package main
 
 import (
+	"log"
+
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
-	"log"
 )
 
 func main() {

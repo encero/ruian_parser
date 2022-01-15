@@ -6,12 +6,13 @@ import (
 	"embed"
 	_ "embed"
 	"fmt"
-	is_ "github.com/matryer/is"
 	"io"
 	"io/fs"
 	"net/http"
 	"testing"
 	"time"
+
+	is_ "github.com/matryer/is"
 )
 
 const defaultWaitTime = time.Millisecond * 10
@@ -254,7 +255,7 @@ loop:
 		is.Equal(items[i], exp)
 	}
 
-	waitForChannel( ctx,is, wait)
+	waitForChannel(ctx, is, wait)
 }
 
 func waitForChannel(ctx context.Context, is *is_.I, wait chan struct{}) {

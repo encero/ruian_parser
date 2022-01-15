@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/encero/ruian_parser/ent"
 	"github.com/encero/ruian_parser/ent/enttest"
 	"github.com/encero/ruian_parser/ent/migrate"
 	is_ "github.com/matryer/is"
-	"testing"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -24,34 +25,41 @@ func testDb(t *testing.T) *ent.Client {
 }
 
 func testCtx() context.Context {
-	ctx, _ := context.WithTimeout(context.Background(), 100*time.Millisecond) //nolint:govet
+	timeout := 100 * time.Millisecond
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+
+	go func() {
+		time.Sleep(timeout * 2)
+		cancel()
+	}()
+
 	return ctx
 }
 
 func TestGetOrCreateAddressPlace(t *testing.T) {
-    is := is_.New(t)
+	is := is_.New(t)
 
-    ec := testDb(t)
-    defer ec.Close()
+	ec := testDb(t)
+	defer ec.Close()
 
-    _, err := ec.
-    AddressPlace.
-    Create().
-    SetID(1).
-    SetNumber(12).
-    SetZip(1).
-    Save(testCtx())
-    is.NoErr(err) // create test address place for retrieval
+	_, err := ec.
+		AddressPlace.
+		Create().
+		SetID(1).
+		SetNumber(12).
+		SetZip(1).
+		Save(testCtx())
+	is.NoErr(err) // create test address place for retrieval
 
-    ap, err := GetOrCreateAddressPlace(testCtx(), ec, 1)
-    is.NoErr(err) // retrieve address place by id
+	ap, err := GetOrCreateAddressPlace(testCtx(), ec, 1)
+	is.NoErr(err) // retrieve address place by id
 
-    is.Equal(ap.Number, int32(12))
+	is.Equal(ap.Number, int32(12))
 
-    ap, err = GetOrCreateAddressPlace(testCtx(), ec, 2)
-    is.NoErr(err) // should create new address place without error
+	ap, err = GetOrCreateAddressPlace(testCtx(), ec, 2)
+	is.NoErr(err) // should create new address place without error
 
-    is.Equal(ap.ID, int32(2))
+	is.Equal(ap.ID, int32(2))
 }
 
 func TestUpdateAddressPlace(t *testing.T) {
@@ -63,8 +71,8 @@ func TestUpdateAddressPlace(t *testing.T) {
 	_, err := ec.Street.Create().SetID(11).SetName("").Save(testCtx())
 	is.NoErr(err)
 
-    ap, err := GetOrCreateAddressPlace(testCtx(), ec, 1)
-    is.NoErr(err) // prepare address place for update
+	ap, err := GetOrCreateAddressPlace(testCtx(), ec, 1)
+	is.NoErr(err) // prepare address place for update
 
 	aps := AddressPlace{
 		Code:              "1",
@@ -97,62 +105,60 @@ func TestUpdateAddressPlace(t *testing.T) {
 }
 
 func TestMapCity(t *testing.T) {
-    is := is_.New(t)
+	is := is_.New(t)
 
-    entc := testDb(t)
-    defer entc.Close()
+	entc := testDb(t)
+	defer entc.Close()
 
-    c := City{
-        Code: "1",
-        Name: "2",
-    }
+	c := City{
+		Code: "1",
+		Name: "2",
+	}
 
-    cu, err := MapCity(entc, c)
-    is.NoErr(err)
+	cu, err := MapCity(entc, c)
+	is.NoErr(err)
 
-    _, err = cu.Save(testCtx())
-    is.NoErr(err)
+	_, err = cu.Save(testCtx())
+	is.NoErr(err)
 
-    cDb, err := entc.City.Get(testCtx(), 1)
-    is.NoErr(err)
+	cDb, err := entc.City.Get(testCtx(), 1)
+	is.NoErr(err)
 
-    is.Equal(cDb.ID, int32(1))
-    is.Equal(cDb.Name, "2")
+	is.Equal(cDb.ID, int32(1))
+	is.Equal(cDb.Name, "2")
 }
 
 func TestGetOrCreateStreet(t *testing.T) {
 	is := is_.New(t)
 
-    ec := testDb(t)
-    defer ec.Close()
+	ec := testDb(t)
+	defer ec.Close()
 
-    ec.City.Create().SetID(11).SetName("").SaveX(testCtx())
+	ec.City.Create().SetID(11).SetName("").SaveX(testCtx())
 
-    ss := Street{
-        Code: "1",
-        Name: "2",
-        Cities: []CityRef{
-            {
-                Code: "11",
-            },
-        },
-    }
+	ss := Street{
+		Code: "1",
+		Name: "2",
+		Cities: []CityRef{
+			{
+				Code: "11",
+			},
+		},
+	}
 
-    s, err := GetOrCreateStreet(testCtx(), ec, 1)
-    is.NoErr(err)
+	s, err := GetOrCreateStreet(testCtx(), ec, 1)
+	is.NoErr(err)
 
-    su, err := UpdateStreet(s, ss)
-    is.NoErr(err)
+	su, err := UpdateStreet(s, ss)
+	is.NoErr(err)
 
-    _, err = su.Save(testCtx())
-    is.NoErr(err)
+	_, err = su.Save(testCtx())
+	is.NoErr(err)
 
-    sDb, err := ec.Street.Get(testCtx(), 1)
-    is.NoErr(err)
+	sDb, err := ec.Street.Get(testCtx(), 1)
+	is.NoErr(err)
 
-    is.Equal(sDb.ID, int32(1))
-    is.Equal(sDb.Name, "2")
-    is.Equal(sDb.QueryCities().OnlyX(testCtx()).ID, int32(11))
+	is.Equal(sDb.ID, int32(1))
+	is.Equal(sDb.Name, "2")
+	is.Equal(sDb.QueryCities().OnlyX(testCtx()).ID, int32(11))
 }
-
-

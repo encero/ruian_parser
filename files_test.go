@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/matryer/is"
 	"io"
 	"testing"
+
+	"github.com/matryer/is"
 )
 
 func TestReadDir(t *testing.T) {

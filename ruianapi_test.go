@@ -2,12 +2,13 @@ package main
 
 import (
 	"bytes"
-	is_ "github.com/matryer/is"
 	"io"
 	"net/http"
 	"sort"
 	"testing"
 	"time"
+
+	is_ "github.com/matryer/is"
 )
 
 type httpDoer func(req *http.Request) (*http.Response, error)
@@ -146,14 +147,11 @@ func TestFilterNewestFromList(t *testing.T) {
 		"https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_599921_UKSH.xml.zip",
 	}
 
-
-
 	got, err := FilterNewestFromList(input)
 	is.NoErr(err)
 
 	sort.Strings(expected)
 	sort.Strings(got)
-
 
 	is.Equal(expected, got)
 }

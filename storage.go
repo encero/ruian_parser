@@ -62,27 +62,26 @@ func StoreStreet(ctx context.Context, entc *ent.Client, item interface{}) (bool,
 		return false, nil
 	}
 
-    code, err := strconv.ParseInt(s.Code, 10, 32)
-    if err != nil {
-        return true, fmt.Errorf("street code is not int")
-    }
+	code, err := strconv.ParseInt(s.Code, 10, 32)
+	if err != nil {
+		return true, fmt.Errorf("street code is not int")
+	}
 
+	street, err := GetOrCreateStreet(ctx, entc, int32(code))
 
-    street, err := GetOrCreateStreet(ctx, entc, int32(code))
-
-    if err != nil {
-        return true, fmt.Errorf("get or create street:%w", err)
-    }
+	if err != nil {
+		return true, fmt.Errorf("get or create street:%w", err)
+	}
 
 	update, err := UpdateStreet(street, s)
 	if err != nil {
 		return true, fmt.Errorf("street mapping err: %w", err)
 	}
 
-    _, err = update.Save(ctx)
-    if err != nil {
-        return true, fmt.Errorf("street save: %w", err)
-    }
+	_, err = update.Save(ctx)
+	if err != nil {
+		return true, fmt.Errorf("street save: %w", err)
+	}
 
 	return true, nil
 }
@@ -93,26 +92,26 @@ func StoreAddressPlace(ctx context.Context, entc *ent.Client, item interface{}) 
 		return false, nil
 	}
 
-    code, err := strconv.ParseInt(aps.Code, 10, 32)
-    if err != nil {
-        return true, fmt.Errorf("address place code is not int")
-    }
+	code, err := strconv.ParseInt(aps.Code, 10, 32)
+	if err != nil {
+		return true, fmt.Errorf("address place code is not int")
+	}
 
-    // todo number parsing, move to elsewhere
-    ap, err := GetOrCreateAddressPlace(ctx, entc, int32(code))
-    if err != nil {
-        return true, fmt.Errorf("address place not found or cant be created: %w", err)
-    }
+	// todo number parsing, move to elsewhere
+	ap, err := GetOrCreateAddressPlace(ctx, entc, int32(code))
+	if err != nil {
+		return true, fmt.Errorf("address place not found or cant be created: %w", err)
+	}
 
-    apu, err := UpdateAddressPlace(ap, aps)
-    if err != nil {
-        return true, fmt.Errorf("address place update: %w", err)
-    }
+	apu, err := UpdateAddressPlace(ap, aps)
+	if err != nil {
+		return true, fmt.Errorf("address place update: %w", err)
+	}
 
-    _, err = apu.Save(ctx)
-    if err != nil {
-        return true, fmt.Errorf("address place save: %w", err)
-    }
+	_, err = apu.Save(ctx)
+	if err != nil {
+		return true, fmt.Errorf("address place save: %w", err)
+	}
 
 	return true, nil
 }

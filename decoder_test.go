@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/matryer/is"
 	"os"
 	"testing"
+
+	"github.com/matryer/is"
 )
 
 var (
