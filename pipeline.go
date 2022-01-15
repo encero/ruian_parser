@@ -14,20 +14,18 @@ import (
 	"path"
 )
 
-
 // Notes:
 // This pipeline concept is usable but has some issues
 // - Its difficult to propagate state changes to previous stages ( file closing )
 // - Download retries are imposible
 // - It was planed to be flexible, in reality the stages are tightly coupled
-// 
+//
 // TODO:
 // - Should be simplified by extracting the working bits to some "provider" services
 // and write "simple" glue function/functions which will handle all the joining bits
 //
 // - because of ruian lack of transfer speed, its desirable to keep preloading flow from Downloader
 // - downloading, caching to disk, parsing and cleanup can be effectively merged to single component
-
 
 type HTTPDoer interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -88,7 +86,7 @@ func downloadFile(ctx context.Context, url string, doer HTTPDoer) (DownloadedFil
 		return file, fmt.Errorf("downloader: new request err: %w", err)
 	}
 
-    response, err := doer.Do(req) //nolint: bodyclose // closed in different part of pipeline
+	response, err := doer.Do(req) //nolint: bodyclose // closed in different part of pipeline
 	if err != nil {
 		return file, fmt.Errorf("downloader: do request err: %w", err)
 	}
@@ -152,7 +150,7 @@ func cacheFile(input io.ReadCloser) (*os.File, error) {
 		return nil, fmt.Errorf("file cacher: create temp file err: %w", err)
 	}
 
-    // todo: retry download on failure
+	// todo: retry download on failure
 	_, err = io.Copy(outFile, input)
 	if err != nil {
 		return nil, fmt.Errorf("file cacher: cant copy file to disk: %w", err)
@@ -213,12 +211,12 @@ func NewDecompressor(in <-chan CachedFile) (<-chan FileContent, Decompressor) {
 				ch <- FileContent{
 					ContentType: "application/xml",
 					FileName:    inputFile.FileName,
-					Content:     &CloserSpy{
-                        r: contentReader,
-                        closeFunc: func() {
-                            inputFile.Content.Close()
-                        },
-                    },
+					Content: &CloserSpy{
+						r: contentReader,
+						closeFunc: func() {
+							inputFile.Content.Close()
+						},
+					},
 				}
 			case <-ctx.Done():
 				return ctx.Err()
@@ -288,16 +286,16 @@ func (s selfDeletingFile) Close() error {
 }
 
 type CloserSpy struct {
-    r io.ReadCloser
-    closeFunc func()
+	r         io.ReadCloser
+	closeFunc func()
 }
 
 func (spy CloserSpy) Close() error {
-    defer spy.closeFunc()
+	defer spy.closeFunc()
 
-    return spy.r.Close()
+	return spy.r.Close()
 }
 
 func (spy CloserSpy) Read(b []byte) (int, error) {
-    return spy.r.Read(b)
+	return spy.r.Read(b)
 }

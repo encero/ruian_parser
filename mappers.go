@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/encero/ruian_parser/ent"
 	"strconv"
+
+	"github.com/encero/ruian_parser/ent"
 )
 
 func GetOrCreateAddressPlace(ctx context.Context, etnc *ent.Client, ID int32) (*ent.AddressPlace, error) {
@@ -31,25 +32,25 @@ func GetOrCreateAddressPlace(ctx context.Context, etnc *ent.Client, ID int32) (*
 }
 
 func GetOrCreateStreet(ctx context.Context, entc *ent.Client, ID int32) (*ent.Street, error) {
-    s, err := entc.Street.Get(ctx, ID)
-    if err != nil && !ent.IsNotFound(err) {
-        return nil, fmt.Errorf("loading street: %w", err)
-    }
+	s, err := entc.Street.Get(ctx, ID)
+	if err != nil && !ent.IsNotFound(err) {
+		return nil, fmt.Errorf("loading street: %w", err)
+	}
 
-    if ent.IsNotFound(err) {
-        sc := entc.Street.Create()
-        sc.SetID(ID)
-        sc.SetName("")
+	if ent.IsNotFound(err) {
+		sc := entc.Street.Create()
+		sc.SetID(ID)
+		sc.SetName("")
 
-        s, err := sc.Save(ctx)
-        if err != nil {
-            return nil, fmt.Errorf("street create: %w", err)
-        }
+		s, err := sc.Save(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("street create: %w", err)
+		}
 
-        return s, nil
-    }
+		return s, nil
+	}
 
-    return s, nil
+	return s, nil
 }
 
 func UpdateAddressPlace(ap *ent.AddressPlace, source AddressPlace) (*ent.AddressPlaceUpdateOne, error) {
@@ -80,7 +81,7 @@ func UpdateAddressPlace(ap *ent.AddressPlace, source AddressPlace) (*ent.Address
 
 	apu.SetOrientationNumberLetter(source.OrientationLetter)
 
-    apu.ClearStreets()
+	apu.ClearStreets()
 
 	for _, street := range source.Streets {
 		streetID, err := strconv.ParseInt(street.Code, 10, 32)
@@ -109,10 +110,10 @@ func MapCity(c *ent.Client, source City) (*ent.CityCreate, error) {
 }
 
 func UpdateStreet(street *ent.Street, source Street) (*ent.StreetUpdateOne, error) {
-    su := street.Update()
+	su := street.Update()
 
 	su.SetName(source.Name)
-    su.ClearCities()
+	su.ClearCities()
 
 	for _, city := range source.Cities {
 		cityID, err := strconv.ParseInt(city.Code, 10, 32)
@@ -120,7 +121,7 @@ func UpdateStreet(street *ent.Street, source Street) (*ent.StreetUpdateOne, erro
 			return nil, fmt.Errorf("city code not int, %w", err)
 		}
 
-        su.AddCityIDs(int32(cityID))
+		su.AddCityIDs(int32(cityID))
 	}
 
 	return su, nil

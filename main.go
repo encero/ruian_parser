@@ -69,9 +69,9 @@ func main() {
 	storage.AddHandler(StoreCity)
 	storage.AddHandler(StoreStreet)
 
-    loaded := 0
-    lastCheckpoint := 0
-    start := time.Now()
+	loaded := 0
+	lastCheckpoint := 0
+	start := time.Now()
 
 	for item := range mapped {
 		err := storage.Store(ctx, item)
@@ -80,15 +80,15 @@ func main() {
 			return
 		}
 
-        loaded ++
-        lastCheckpoint ++
+		loaded++
+		lastCheckpoint++
 
-        if since := time.Since(start).Seconds(); since > 5 {
-            log.Printf("processed: %d %f,0/s", loaded, float64(lastCheckpoint)/since)
+		if since := time.Since(start).Seconds(); since > 5 {
+			log.Printf("processed: %d %f,0/s", loaded, float64(lastCheckpoint)/since)
 
-            start = time.Now()
-            lastCheckpoint = 0
-        }
+			start = time.Now()
+			lastCheckpoint = 0
+		}
 	}
 
 	log.Println("process finished")

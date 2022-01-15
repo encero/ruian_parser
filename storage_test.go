@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"testing"
+
 	"github.com/encero/ruian_parser/ent"
 	is_ "github.com/matryer/is"
-	"testing"
 )
 
 func TestStorageStore(t *testing.T) {
@@ -43,7 +44,7 @@ func TestStorageStore_CallsAllHandlers(t *testing.T) {
 
 	callCount := 0
 	handler := func(_ context.Context, _ *ent.Client, item interface{}) (bool, error) {
-		callCount ++
+		callCount++
 
 		is.Equal(item, in) // should get same item
 
