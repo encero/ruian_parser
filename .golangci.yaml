@@ -23,5 +23,10 @@ linters:
     - wastedassign
     - whitespace
     - wsl
+    - asciicheck
+    - bidichk
+    - gofmt
+    - govet
+    - goimports
 run:
   skip-dirs:
