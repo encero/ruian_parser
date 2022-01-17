@@ -12,14 +12,22 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type Config struct {
+	SourceDataURL string
+}
+
 func main() {
-	err := run()
+	cfg := Config{
+		SourceDataURL: "",
+	}
+
+	err := run(cfg)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func run() error {
+func run(cfg Config) error {
 	entc, err := connectDB()
 	if err != nil {
 		return err

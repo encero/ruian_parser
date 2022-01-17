@@ -39,19 +39,51 @@ type RuianAPI struct {
 	Doer interface {
 		Do(req *http.Request) (*http.Response, error)
 	}
+
+	FullDataLinkListURL                string
+	IncrementalDataLinkListURLTemplate string
 }
 
 const (
 	userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
 
-	fullDataLinkListURL                = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=U&vf.up=OB&vf.ds=K&_vf.vu=on&_vf.vu=on&_vf.vu=on&_vf.vu=on&vf.uo=A&search=Vyhledat"
-	incrementalDataLinkListURLTemplate = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=Z&vf.pd={_date_}&vf.ds=K&_vf.vu=on&_vf.vu=on&vf.vu=H&_vf.vu=on&_vf.vu=on&search=Vyhledat"
+	defaulfullDataLinkListURL                = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=U&vf.up=OB&vf.ds=K&_vf.vu=on&_vf.vu=on&_vf.vu=on&_vf.vu=on&vf.uo=A&search=Vyhledat"
+	defaulIncrementalDataLinkListURLTemplate = "https://vdp.cuzk.cz/vdp/ruian/vymennyformat/seznamlinku?vf.pu=S&_vf.pu=on&_vf.pu=on&vf.cr=Z&vf.pd={_date_}&vf.ds=K&_vf.vu=on&_vf.vu=on&vf.vu=H&_vf.vu=on&_vf.vu=on&search=Vyhledat"
 
 	defaultFullResultLinkCount = 20_000
 )
 
+type ApiOption func(*RuianAPI)
+
+func ApiWithDoer(doer interface {
+	Do(req *http.Request) (*http.Response, error)
+}) ApiOption {
+	return func(api *RuianAPI) {
+		api.Doer = doer
+	}
+}
+
+func ApiFromConfig(cfg Config) ApiOption {
+	return func(api *RuianAPI) {
+		// TOOD: configure from app config
+	}
+}
+
+func NewRuianAPI(options ...func(*RuianAPI)) RuianAPI {
+	api := RuianAPI{
+		FullDataLinkListURL:                defaulfullDataLinkListURL,
+		IncrementalDataLinkListURLTemplate: defaulIncrementalDataLinkListURLTemplate,
+	}
+
+	for _, opt := range options {
+		opt(&api)
+	}
+
+	return api
+}
+
 func (api RuianAPI) FullDataLinkList(ctx context.Context) ([]string, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", fullDataLinkListURL, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", defaulfullDataLinkListURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +103,7 @@ func (api RuianAPI) FullDataLinkList(ctx context.Context) ([]string, error) {
 }
 
 func (api RuianAPI) IncrementalDataLinkList(ctx context.Context, fromDate time.Time) ([]string, error) {
-	url := strings.Replace(incrementalDataLinkListURLTemplate, "{_date_}", fromDate.Format("02.01.2006"), 1)
+	url := strings.Replace(defaulIncrementalDataLinkListURLTemplate, "{_date_}", fromDate.Format("02.01.2006"), 1)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
