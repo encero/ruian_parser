@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -12,18 +13,18 @@ import (
 )
 
 func main() {
-	entc, err := ent.Open("sqlite3", "file:db.lite?cache=shared&_fk=1&_journal_mode=wal")
+	err := run()
 	if err != nil {
-		log.Printf("failed opening connection to sqlite: %v", err)
-		return
+		log.Println(err)
+	}
+}
+
+func run() error {
+	entc, err := connectDB()
+	if err != nil {
+		return err
 	}
 	defer entc.Close()
-
-	// Run the auto migration tool.
-	if err := entc.Schema.Create(context.Background(), migrate.WithForeignKeys(false)); err != nil {
-		log.Printf("failed creating schema resources: %v", err)
-		return
-	}
 
 	httpClient := &http.Client{
 		Timeout: 5 * time.Minute,
@@ -33,23 +34,69 @@ func main() {
 		Doer: httpClient,
 	}
 
+	list, err := loadLinkList(api)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	mapped := buildPipeline(ctx, httpClient, list)
+	storage := configureStorage(entc)
+
+	storeMappedItems(ctx, mapped, storage)
+
+	log.Println("process finished")
+
+	return nil
+}
+
+func loadLinkList(api RuianAPI) ([]string, error) {
 	log.Println("loading full data link list")
 
 	list, err := api.FullDataLinkList(context.Background())
 	if err != nil {
-		log.Printf("failed getting full data link list: %v", err)
-		return
+		return nil, fmt.Errorf("failed getting full data link list: %w", err)
 	}
 
 	log.Println("loaded")
 
 	list, err = FilterNewestFromList(list)
 	if err != nil {
-		log.Printf("failed filtering newest from list: %v", err)
-		return
+		return nil, fmt.Errorf("failed filtering newest from list: %w", err)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	return list, nil
+}
+
+func connectDB() (*ent.Client, error) {
+	entc, err := ent.Open("sqlite3", "file:db.lite?cache=shared&_fk=1&_journal_mode=wal")
+	if err != nil {
+		return nil, fmt.Errorf("failed opening connection to sqlite: %w", err)
+	}
+	defer entc.Close()
+
+	// Run the auto migration tool.
+	if err := entc.Schema.Create(context.Background(), migrate.WithForeignKeys(false)); err != nil {
+		return nil, fmt.Errorf("failed creating schema resources: %w", err)
+	}
+
+	return entc, nil
+}
+
+func runStep(ctx context.Context, cancel context.CancelFunc, step func(context.Context) error) {
+	go func() {
+		err := step(ctx)
+		if err != nil {
+			log.Printf("failed running step: %v", err)
+			cancel()
+		}
+	}()
+}
+
+func buildPipeline(ctx context.Context, httpClient *http.Client, list []string) <-chan interface{} {
+	ctx, cancel := context.WithCancel(ctx)
 
 	downloaded, downloader := NewDownloader(httpClient, list)
 	runStep(ctx, cancel, downloader)
@@ -63,12 +110,20 @@ func main() {
 	mapped, mapper := NewMapper(decompressed)
 	runStep(ctx, cancel, mapper)
 
+	return mapped
+}
+
+func configureStorage(entc *ent.Client) *Storage {
 	storage := NewStorage(entc)
 
 	storage.AddHandler(StoreAddressPlace)
 	storage.AddHandler(StoreCity)
 	storage.AddHandler(StoreStreet)
 
+	return storage
+}
+
+func storeMappedItems(ctx context.Context, mapped <-chan interface{}, storage *Storage) {
 	loaded := 0
 	lastCheckpoint := 0
 	start := time.Now()
@@ -90,16 +145,4 @@ func main() {
 			lastCheckpoint = 0
 		}
 	}
-
-	log.Println("process finished")
-}
-
-func runStep(ctx context.Context, cancel context.CancelFunc, step func(context.Context) error) {
-	go func() {
-		err := step(ctx)
-		if err != nil {
-			log.Printf("failed running step: %v", err)
-			cancel()
-		}
-	}()
 }
