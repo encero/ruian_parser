@@ -23,7 +23,7 @@ func TestFetchFullLoadList(t *testing.T) {
 	api := RuianAPI{
 		Doer: httpDoer(func(req *http.Request) (*http.Response, error) {
 			is.Equal(req.Method, "GET")
-			is.Equal(req.URL.String(), fullDataLinkListURL)
+			is.Equal(req.URL.String(), defaulfullDataLinkListURL)
 
 			return &http.Response{
 				StatusCode: 200,
